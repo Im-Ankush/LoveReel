@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navigation from './components/Navigation.jsx'
+import Login from './components/Login.jsx'
 import Home from './pages/Home.jsx'
 import Funny from './pages/Funny.jsx'
 import Romantic from './pages/Romantic.jsx'
@@ -47,8 +48,76 @@ import UsFeeling from './pages/UsFeeling.jsx'
 import SendThisToMe from './pages/SendThisToMe.jsx'
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Check authentication status on mount
+  useEffect(() => {
+    const checkAuthentication = () => {
+      const authStatus = localStorage.getItem('isAuthenticated')
+      const loginTimestamp = localStorage.getItem('loginTimestamp')
+      
+      if (authStatus === 'true' && loginTimestamp) {
+        const now = Date.now()
+        const loginTime = parseInt(loginTimestamp, 10)
+        const hoursSinceLogin = (now - loginTime) / (1000 * 60 * 60) // Convert to hours
+        
+        // Check if 24 hours have passed
+        if (hoursSinceLogin >= 24) {
+          // Session expired, clear authentication
+          localStorage.removeItem('isAuthenticated')
+          localStorage.removeItem('loginTimestamp')
+          setIsAuthenticated(false)
+        } else {
+          // Still within 24 hours
+          setIsAuthenticated(true)
+        }
+      } else {
+        setIsAuthenticated(false)
+      }
+      setIsLoading(false)
+    }
+    
+    checkAuthentication()
+    
+    // Check authentication every hour to catch expiration
+    const interval = setInterval(checkAuthentication, 60 * 60 * 1000) // Check every hour
+    
+    return () => clearInterval(interval)
+  }, [])
+
+  const handleLogin = () => {
+    setIsAuthenticated(true)
+  }
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      }}>
+        <div style={{ color: 'white', fontSize: '20px' }}>Loading...</div>
+      </div>
+    )
+  }
+
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />
+  }
+
+  // Show app if authenticated
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <Navigation />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -99,8 +168,5 @@ function App() {
     </Router>
   )
 }
-
-// Debug: Log when App renders
-console.log('App component rendered')
 
 export default App
