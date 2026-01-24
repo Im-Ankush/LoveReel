@@ -90,7 +90,7 @@ const Navigation = () => {
       <div style={styles.navContent}>
         <Link to="/" style={styles.logo}>
           <span style={styles.logoEmoji}>💕</span>
-          <span style={styles.logoText}>LoveReel</span>
+          <span style={styles.logoText}>LoveInFrames</span>
         </Link>
 
         {!isHomePage && (

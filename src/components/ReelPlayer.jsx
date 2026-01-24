@@ -424,7 +424,7 @@ const ReelPlayer = ({ slides = [], slideDuration, onComplete, backgroundConfig, 
 const Watermark = () => {
   return (
     <div style={styles.watermark}>
-      LoveReel
+      LoveInFrames
     </div>
   )
 }

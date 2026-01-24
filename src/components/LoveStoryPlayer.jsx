@@ -192,7 +192,7 @@ const LoveStoryPlayer = ({ steps = [], emojiBackground, autoStart = true }) => {
         zIndex: 3,
         pointerEvents: 'none',
       }}>
-        LoveReel
+        LoveInFrames
       </div>
 
       <AnimatePresence mode="wait">
