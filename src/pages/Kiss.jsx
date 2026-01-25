@@ -4,7 +4,7 @@ import ReelPlayer from '../components/ReelPlayer.jsx'
 const Kiss = () => {
   const backgroundConfig = {
     type: 'image',
-    url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1080&q=80',
+    url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=1080&q=80',
   }
   
   const slides = [
