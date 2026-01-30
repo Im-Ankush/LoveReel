@@ -227,6 +227,33 @@ const ReelPlayer = ({ slides = [], slideDuration, onComplete, backgroundConfig, 
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [isPlaying, isComplete, normalizedSlides.length, currentIndex, slides])
 
+  // Click on screen toggles pause (same as Space)
+  const handleTogglePlayback = useCallback(() => {
+    if (isPlaying) {
+      setIsPlaying(false)
+    } else {
+      if (normalizedSlides.length === 0 && slides.length > 0) {
+        const normalized = normalizeSlides(slides)
+        setNormalizedSlides(normalized)
+        requestAnimationFrame(() => {
+          setIsComplete(false)
+          setCurrentIndex(0)
+          setIsPlaying(true)
+        })
+      } else if (normalizedSlides.length > 0) {
+        if (isComplete) {
+          setPendingResume(true)
+          setIsComplete(false)
+          setCurrentIndex(0)
+        } else {
+          const validIndex = Math.max(0, Math.min(currentIndex, normalizedSlides.length - 1))
+          if (validIndex !== currentIndex) setCurrentIndex(validIndex)
+          setIsPlaying(true)
+        }
+      }
+    }
+  }, [isPlaying, isComplete, normalizedSlides.length, currentIndex, slides])
+
   // Handle resume after completion
   useEffect(() => {
     if (pendingResume && !isComplete && currentIndex === 0 && normalizedSlides.length > 0) {
@@ -343,8 +370,6 @@ const ReelPlayer = ({ slides = [], slideDuration, onComplete, backgroundConfig, 
             <motion.button
               onClick={handleStart}
               style={styles.startButton}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -366,7 +391,7 @@ const ReelPlayer = ({ slides = [], slideDuration, onComplete, backgroundConfig, 
     displayIndex < normalizedSlides.length
 
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} onClick={handleTogglePlayback} role="button" tabIndex={0} aria-label="Click or press Space to pause or resume">
       {emojiBackground && (
         <>
           <EmojiBackground 
@@ -440,6 +465,7 @@ const styles = {
     padding: '24px',
     position: 'relative',
     overflow: 'hidden',
+    cursor: 'none',
   },
   overlay: {
     position: 'absolute',

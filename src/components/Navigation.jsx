@@ -1,89 +1,44 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import {
+  getDashboardConfig,
+  applyDashboardConfig,
+  getOrderedParents,
+  filterHiddenPages,
+  PARENT_IDS,
+  PARENT_LABELS,
+} from '../utils/dashboardConfig.js'
+import { ALL_CATEGORIES } from '../utils/siteConfig.js'
 
-const Navigation = () => {
+const Navigation = ({ onLogout }) => {
   const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : 'full'
 
-  // Hide navigation on reel pages (not home page)
+  const config = getDashboardConfig()
+  const visibleCategories = filterHiddenPages(ALL_CATEGORIES, config)
+  const grouped =
+    userRole === 'full'
+      ? applyDashboardConfig(visibleCategories, config)
+      : null
+  const orderedParents = userRole === 'full' ? getOrderedParents(config) : []
+  const categories =
+    userRole === 'education'
+      ? visibleCategories.filter((c) => c.title === 'Education')
+      : userRole === 'love'
+        ? visibleCategories.filter((c) => c.title !== 'Education')
+        : []
+  const showGroupedNav = userRole === 'full' && grouped && orderedParents.length > 0
+
+  // Show nav only on Home and Admin — not on content/reel pages or education pages
   const isHomePage = location.pathname === '/'
+  const isAdminPage = location.pathname.startsWith('/admin')
+  const showNav = isHomePage || (userRole === 'full' && isAdminPage)
 
-  // Hide navigation when on reel pages
-  if (!isHomePage) {
+  if (!showNav) {
     return null
   }
-
-  const categories = [
-    {
-      title: 'Main Vibes',
-      pages: [
-        { path: '/funny', label: 'Funny', emoji: '😂' },
-        { path: '/romantic', label: 'Romantic', emoji: '❤️' },
-        { path: '/flirty', label: 'Flirty', emoji: '😏' },
-        { path: '/mixed', label: 'Mixed', emoji: '✨' },
-      ]
-    },
-    {
-      title: 'Romantic Moments',
-      pages: [
-        { path: '/hug', label: 'Hug', emoji: '🤗' },
-        { path: '/kiss', label: 'Forehead Kiss', emoji: '😘' },
-        { path: '/miss-you', label: 'Miss You', emoji: '🥺' },
-        { path: '/reunion', label: 'Reunion', emoji: '❤️' },
-        { path: '/hands', label: 'Holding Hands', emoji: '🤝' },
-        { path: '/cuddle', label: 'Cuddle', emoji: '💞' },
-        { path: '/late-night', label: 'Late Night', emoji: '🌙' },
-        { path: '/sleep-call', label: 'Sleep Call', emoji: '📱' },
-        { path: '/laugh', label: 'Laugh Together', emoji: '😂' },
-        { path: '/safe', label: 'Safe in Arms', emoji: '🛌' },
-        { path: '/goodbye', label: 'Goodbye', emoji: '😢' },
-        { path: '/surprise', label: 'Surprise', emoji: '😍' },
-        { path: '/tight-hug', label: 'Tight Hug', emoji: '🤍' },
-        { path: '/understanding', label: 'Understanding', emoji: '✨' },
-        { path: '/home', label: 'Home is You', emoji: '🏠' },
-      ]
-    },
-    {
-      title: 'Emoji Vibes',
-      pages: [
-        { path: '/hug-vibes', label: 'Hug Vibes', emoji: '🤗' },
-        { path: '/kiss-energy', label: 'Kiss Energy', emoji: '😘' },
-        { path: '/miss-you-vibes', label: 'Miss You Vibes', emoji: '🥺' },
-        { path: '/cuddle-mode', label: 'Cuddle Mode', emoji: '🫶' },
-        { path: '/late-night-love', label: 'Late Night Love', emoji: '🌙' },
-        { path: '/soft-romance', label: 'Soft Romance', emoji: '💫' },
-        { path: '/heartbeats', label: 'Heartbeats', emoji: '💓' },
-        { path: '/love-mood', label: 'Love Mood', emoji: '💕' },
-        { path: '/together-feel', label: 'Together Feel', emoji: '🤝' },
-        { path: '/warmth', label: 'Warmth', emoji: '🔥' },
-      ]
-    },
-    {
-      title: 'Love Stories',
-      pages: [
-        { path: '/send-this-to-your-person', label: 'Send This To Your Person', emoji: '💕' },
-        { path: '/answer-me-honestly', label: 'Answer Me Honestly', emoji: '💞' },
-        { path: '/only-for-my-love', label: 'Only For My Love', emoji: '🤍' },
-        { path: '/do-you-feel-this-too', label: 'Do You Feel This Too', emoji: '💖' },
-        { path: '/quiet-love-questions', label: 'Quiet Love Questions', emoji: '✨' },
-        { path: '/late-night-thoughts', label: 'Late Night Thoughts', emoji: '🌙' },
-        { path: '/real-love-check', label: 'Real Love Check', emoji: '❤️' },
-        { path: '/soft-confession', label: 'Soft Confession', emoji: '🤍' },
-        { path: '/heart-to-heart', label: 'Heart To Heart', emoji: '💖' },
-      ]
-    },
-    {
-      title: 'Interactive Stories',
-      pages: [
-        { path: '/if-you-love-me', label: 'If You Love Me', emoji: '🤍' },
-        { path: '/love-check', label: 'Love Check', emoji: '💖' },
-        { path: '/answer-honestly', label: 'Answer Honestly', emoji: '💞' },
-        { path: '/us-feeling', label: 'Us Feeling', emoji: '🤍' },
-        { path: '/send-this-to-me', label: 'Send This To Me', emoji: '💕' },
-      ]
-    }
-  ]
 
   return (
     <nav style={styles.nav}>
@@ -93,21 +48,34 @@ const Navigation = () => {
           <span style={styles.logoText}>LoveInFrames</span>
         </Link>
 
-        {!isHomePage && (
-          <motion.button
-            style={styles.menuButton}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            aria-label="Toggle menu"
-          >
-            <span style={styles.menuIcon}>{isMenuOpen ? '✕' : '☰'}</span>
-          </motion.button>
-        )}
+        <div style={styles.navRight}>
+          {userRole === 'full' && !isAdminPage && (
+            <Link to="/admin" style={styles.adminLink}>Admin</Link>
+          )}
+          {!isHomePage && !isAdminPage && (
+            <motion.button
+              style={styles.menuButton}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <span style={styles.menuIcon}>{isMenuOpen ? '✕' : '☰'}</span>
+            </motion.button>
+          )}
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              style={styles.logoutButton}
+              aria-label="Logout"
+            >
+              Logout
+            </button>
+          )}
+        </div>
       </div>
 
       <AnimatePresence>
-        {isMenuOpen && !isHomePage && (
+        {isMenuOpen && !isHomePage && !isAdminPage && (
           <motion.div
             style={styles.menu}
             initial={{ opacity: 0, y: -20 }}
@@ -126,31 +94,68 @@ const Navigation = () => {
               </Link>
               
               <div style={styles.categoriesContainer}>
-                {categories.map((category, catIndex) => (
-                  <div key={category.title} style={styles.categorySection}>
-                    <h3 style={styles.categoryTitle}>{category.title}</h3>
-                    <div style={styles.categoryLinks}>
-                      {category.pages.map((page) => {
-                        const isActive = location.pathname === page.path
-                        return (
-                          <Link
-                            key={page.path}
-                            to={page.path}
-                            style={{
-                              ...styles.categoryLink,
-                              ...(isActive ? styles.activeLink : {})
-                            }}
-                            onClick={() => setIsMenuOpen(false)}
-                          >
-                            <span style={styles.linkEmoji}>{page.emoji}</span>
-                            <span>{page.label}</span>
-                            {isActive && <span style={styles.activeIndicator}>●</span>}
-                          </Link>
-                        )
-                      })}
+                {showGroupedNav ? (
+                  orderedParents.map((parentId) => {
+                    const childCategories = parentId === PARENT_IDS.LOVE ? grouped.love : grouped.education
+                    const parentLabel = PARENT_LABELS[parentId]
+                    return (
+                      <div key={parentId} style={styles.parentNavSection}>
+                        <h3 style={styles.parentNavTitle}>{parentLabel}</h3>
+                        {childCategories.map((category) => (
+                          <div key={category.title} style={styles.categorySection}>
+                            <h4 style={styles.categoryTitle}>{category.title}</h4>
+                            <div style={styles.categoryLinks}>
+                              {category.pages.map((page) => {
+                                const isActive = location.pathname === page.path
+                                return (
+                                  <Link
+                                    key={page.path}
+                                    to={page.path}
+                                    style={{
+                                      ...styles.categoryLink,
+                                      ...(isActive ? styles.activeLink : {}),
+                                    }}
+                                    onClick={() => setIsMenuOpen(false)}
+                                  >
+                                    <span style={styles.linkEmoji}>{page.emoji}</span>
+                                    <span>{page.label}</span>
+                                    {isActive && <span style={styles.activeIndicator}>●</span>}
+                                  </Link>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  })
+                ) : (
+                  categories.map((category) => (
+                    <div key={category.title} style={styles.categorySection}>
+                      <h3 style={styles.categoryTitle}>{category.title}</h3>
+                      <div style={styles.categoryLinks}>
+                        {category.pages.map((page) => {
+                          const isActive = location.pathname === page.path
+                          return (
+                            <Link
+                              key={page.path}
+                              to={page.path}
+                              style={{
+                                ...styles.categoryLink,
+                                ...(isActive ? styles.activeLink : {}),
+                              }}
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              <span style={styles.linkEmoji}>{page.emoji}</span>
+                              <span>{page.label}</span>
+                              {isActive && <span style={styles.activeIndicator}>●</span>}
+                            </Link>
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </motion.div>
@@ -170,6 +175,7 @@ const styles = {
     background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 100%)',
     backdropFilter: 'blur(10px)',
     borderBottom: '1px solid rgba(255, 77, 109, 0.2)',
+    cursor: 'auto', // Cursor visible on dashboard / when nav is shown
   },
   navContent: {
     display: 'flex',
@@ -199,6 +205,11 @@ const styles = {
     WebkitTextFillColor: 'transparent',
     backgroundClip: 'text',
   },
+  navRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
   menuButton: {
     background: 'rgba(255, 77, 109, 0.2)',
     border: '2px solid rgba(255, 77, 109, 0.4)',
@@ -211,6 +222,28 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     transition: 'all 0.3s ease',
+  },
+  adminLink: {
+    padding: '8px 14px',
+    borderRadius: '8px',
+    color: '#ffffff',
+    fontSize: '14px',
+    fontWeight: 600,
+    textDecoration: 'none',
+    background: 'rgba(255, 77, 109, 0.3)',
+    border: '2px solid rgba(255, 77, 109, 0.5)',
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
+  logoutButton: {
+    background: 'rgba(255, 255, 255, 0.15)',
+    border: '2px solid rgba(255, 255, 255, 0.3)',
+    borderRadius: '8px',
+    padding: '8px 16px',
+    color: '#ffffff',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   },
   menuIcon: {
     lineHeight: 1,
@@ -256,8 +289,22 @@ const styles = {
     flexDirection: 'column',
     gap: '24px',
   },
+  parentNavSection: {
+    marginBottom: '20px',
+  },
+  parentNavTitle: {
+    fontSize: '13px',
+    fontWeight: 700,
+    color: '#ff758f',
+    textTransform: 'uppercase',
+    letterSpacing: '1px',
+    marginBottom: '12px',
+    paddingBottom: '6px',
+    borderBottom: '1px solid rgba(255, 117, 143, 0.3)',
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
   categorySection: {
-    marginBottom: '8px',
+    marginBottom: '12px',
   },
   categoryTitle: {
     fontSize: '15px',

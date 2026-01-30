@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import { getUsers } from '../utils/usersConfig.js'
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('')
@@ -7,22 +8,23 @@ const Login = ({ onLogin }) => {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  // Hardcoded credentials
-  const HARDCODED_USERNAME = 'admin'
-  const HARDCODED_PASSWORD = 'password123'
-
   const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
     setIsLoading(true)
 
-    // Simulate a small delay for better UX
     setTimeout(() => {
-      if (username === HARDCODED_USERNAME && password === HARDCODED_PASSWORD) {
-        // Store authentication and login timestamp in localStorage
+      const users = getUsers()
+      const user = users.find(
+        (u) => u.username === username.trim() && u.password === password
+      )
+      if (user) {
         const loginTimestamp = Date.now()
         localStorage.setItem('isAuthenticated', 'true')
         localStorage.setItem('loginTimestamp', loginTimestamp.toString())
+        localStorage.setItem('userRole', user.role)
+        localStorage.setItem('username', user.username || '')
+        localStorage.setItem('userDisplayName', user.displayName != null ? user.displayName : user.username || '')
         onLogin()
       } else {
         setError('Invalid username or password')
@@ -181,8 +183,6 @@ const Login = ({ onLogin }) => {
               ...styles.button,
               ...(isLoading ? styles.buttonDisabled : {}),
             }}
-            whileHover={!isLoading ? styles.buttonHover : {}}
-            whileTap={!isLoading ? { scale: 0.98 } : {}}
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </motion.button>
