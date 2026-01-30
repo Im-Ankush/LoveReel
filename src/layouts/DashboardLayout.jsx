@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   getDashboardConfig,
@@ -9,17 +9,24 @@ import {
   PARENT_LABELS,
 } from '../utils/dashboardConfig.js'
 import { ALL_CATEGORIES } from '../utils/siteConfig.js'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
 
 const PARENT_EMOJI = { [PARENT_IDS.LOVE]: '💕', [PARENT_IDS.EDUCATION]: '📚' }
 
 const DashboardLayout = ({ children }) => {
   const location = useLocation()
+  const isMobile = useMediaQuery()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [expandedParents, setExpandedParents] = useState({ [PARENT_IDS.LOVE]: false, [PARENT_IDS.EDUCATION]: false })
   const [expandedCategories, setExpandedCategories] = useState({})
   const config = getDashboardConfig()
   const visibleCategories = filterHiddenPages(ALL_CATEGORIES, config)
   const grouped = applyDashboardConfig(visibleCategories, config)
   const orderedParents = getOrderedParents(config)
+
+  useEffect(() => {
+    if (!isMobile) setSidebarOpen(false)
+  }, [isMobile])
 
   const isParentOpen = (id) => expandedParents[id] === true
   const isCategoryOpen = (parentId, title) => expandedCategories[`${parentId}-${title}`] === true
@@ -28,10 +35,26 @@ const DashboardLayout = ({ children }) => {
     const key = `${parentId}-${title}`
     setExpandedCategories((prev) => ({ ...prev, [key]: !isCategoryOpen(parentId, title) }))
   }
+  const closeSidebar = () => setSidebarOpen(false)
 
   return (
     <div style={styles.wrapper}>
-      <aside style={styles.sidebar}>
+      {isMobile && (
+        <button type="button" onClick={() => setSidebarOpen(true)} style={styles.menuButton} aria-label="Open menu">
+          ☰
+        </button>
+      )}
+      {isMobile && sidebarOpen && (
+        <div style={styles.overlay} onClick={closeSidebar} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Escape' && closeSidebar()} aria-label="Close menu" />
+      )}
+      <aside style={{
+        ...styles.sidebar,
+        ...(isMobile ? styles.sidebarMobile : {}),
+        ...(isMobile && sidebarOpen ? styles.sidebarMobileOpen : {}),
+      }}>
+        {isMobile && (
+          <button type="button" onClick={closeSidebar} style={styles.sidebarClose} aria-label="Close menu">✕</button>
+        )}
         <div style={styles.sidebarHeader}>
           <span style={styles.sidebarLogo}>📊</span>
           <span style={styles.sidebarTitle}>Dashboard</span>
@@ -43,6 +66,7 @@ const DashboardLayout = ({ children }) => {
               ...styles.navLink,
               ...(location.pathname === '/' ? styles.navLinkActive : {}),
             }}
+            onClick={closeSidebar}
           >
             <span style={styles.navEmoji}>🏠</span>
             <span>Home</span>
@@ -53,6 +77,7 @@ const DashboardLayout = ({ children }) => {
               ...styles.navLink,
               ...(location.pathname.startsWith('/admin') ? styles.navLinkActive : {}),
             }}
+            onClick={closeSidebar}
           >
             <span style={styles.navEmoji}>⚙️</span>
             <span>Admin panel</span>
@@ -101,6 +126,7 @@ const DashboardLayout = ({ children }) => {
                                     ...styles.pageLink,
                                     ...(isActive ? styles.pageLinkActive : {}),
                                   }}
+                                  onClick={closeSidebar}
                                 >
                                   <span style={styles.linkEmoji}>{p.emoji}</span>
                                   <span>{p.label}</span>
@@ -117,7 +143,7 @@ const DashboardLayout = ({ children }) => {
           })}
         </nav>
       </aside>
-      <main style={styles.main}>{children}</main>
+      <main style={{ ...styles.main, ...(isMobile ? styles.mainMobile : {}) }} className={isMobile ? 'admin-main-mobile' : ''}>{children}</main>
     </div>
   )
 }
@@ -130,6 +156,33 @@ const styles = {
     paddingTop: '60px',
     cursor: 'auto',
     overflow: 'hidden',
+    position: 'relative',
+  },
+  menuButton: {
+    position: 'fixed',
+    top: '12px',
+    left: '12px',
+    zIndex: 1001,
+    width: '44px',
+    height: '44px',
+    borderRadius: '10px',
+    border: '2px solid rgba(255, 77, 109, 0.4)',
+    background: 'rgba(255, 77, 109, 0.2)',
+    color: '#fff',
+    fontSize: '20px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0,0,0,0.5)',
+    zIndex: 998,
   },
   sidebar: {
     width: '260px',
@@ -141,6 +194,35 @@ const styles = {
     flexDirection: 'column',
     padding: '20px 0',
     overflowY: 'auto',
+  },
+  sidebarMobile: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    height: '100vh',
+    width: '280px',
+    maxWidth: '85vw',
+    zIndex: 999,
+    transform: 'translateX(-100%)',
+    transition: 'transform 0.25s ease',
+    boxShadow: 'none',
+  },
+  sidebarMobileOpen: {
+    transform: 'translateX(0)',
+    boxShadow: '4px 0 24px rgba(0,0,0,0.4)',
+  },
+  sidebarClose: {
+    position: 'absolute',
+    top: '16px',
+    right: '16px',
+    width: '40px',
+    height: '40px',
+    borderRadius: '8px',
+    border: 'none',
+    background: 'rgba(255,255,255,0.1)',
+    color: '#fff',
+    fontSize: '18px',
+    cursor: 'pointer',
   },
   sidebarHeader: {
     display: 'flex',
@@ -271,6 +353,10 @@ const styles = {
     overflowY: 'auto',
     overflowX: 'hidden',
     background: 'rgba(0,0,0,0.2)',
+  },
+  mainMobile: {
+    padding: '16px',
+    width: '100%',
   },
 }
 

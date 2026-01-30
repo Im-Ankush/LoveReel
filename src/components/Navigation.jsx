@@ -10,10 +10,12 @@ import {
   PARENT_LABELS,
 } from '../utils/dashboardConfig.js'
 import { ALL_CATEGORIES } from '../utils/siteConfig.js'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
 
 const Navigation = ({ onLogout }) => {
   const location = useLocation()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const isMobile = useMediaQuery()
   const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : 'full'
 
   const config = getDashboardConfig()
@@ -42,8 +44,8 @@ const Navigation = ({ onLogout }) => {
 
   return (
     <nav style={styles.nav}>
-      <div style={styles.navContent}>
-        <Link to="/" style={styles.logo}>
+      <div style={{ ...styles.navContent, ...(isMobile ? styles.navContentMobile : {}) }}>
+        <Link to="/" style={{ ...styles.logo, ...(isMobile ? styles.logoMobile : {}) }}>
           <span style={styles.logoEmoji}>💕</span>
           <span style={styles.logoText}>LoveInFrames</span>
         </Link>
@@ -104,7 +106,7 @@ const Navigation = ({ onLogout }) => {
                         {childCategories.map((category) => (
                           <div key={category.title} style={styles.categorySection}>
                             <h4 style={styles.categoryTitle}>{category.title}</h4>
-                            <div style={styles.categoryLinks}>
+                            <div style={{ ...styles.categoryLinks, ...(isMobile ? styles.categoryLinksMobile : {}) }}>
                               {category.pages.map((page) => {
                                 const isActive = location.pathname === page.path
                                 return (
@@ -133,7 +135,7 @@ const Navigation = ({ onLogout }) => {
                   categories.map((category) => (
                     <div key={category.title} style={styles.categorySection}>
                       <h3 style={styles.categoryTitle}>{category.title}</h3>
-                      <div style={styles.categoryLinks}>
+                      <div style={{ ...styles.categoryLinks, ...(isMobile ? styles.categoryLinksMobile : {}) }}>
                         {category.pages.map((page) => {
                           const isActive = location.pathname === page.path
                           return (
@@ -172,6 +174,7 @@ const styles = {
     left: 0,
     right: 0,
     zIndex: 1000,
+    overflow: 'visible',
     background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 100%)',
     backdropFilter: 'blur(10px)',
     borderBottom: '1px solid rgba(255, 77, 109, 0.2)',
@@ -181,13 +184,16 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: '12px',
     padding: '12px 20px',
     maxWidth: '100%',
+    minWidth: 0,
   },
   logo: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
+    minWidth: 0,
     textDecoration: 'none',
     color: '#ffffff',
     fontSize: '20px',
@@ -209,6 +215,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
+    flexShrink: 0,
   },
   menuButton: {
     background: 'rgba(255, 77, 109, 0.2)',
@@ -320,6 +327,19 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
     gap: '8px',
+  },
+  categoryLinksMobile: {
+    gridTemplateColumns: '1fr',
+    minWidth: 0,
+  },
+  navContentMobile: {
+    padding: '10px 16px 10px 56px',
+  },
+  logoMobile: {
+    fontSize: '16px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   categoryLink: {
     display: 'flex',

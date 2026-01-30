@@ -92,7 +92,7 @@ const AdminRoutes = () => {
         {Object.keys(aliases).length === 0 ? (
           <p style={styles.empty}>No aliases. Add one above.</p>
         ) : (
-          <div style={styles.tableWrap}>
+          <div style={styles.tableWrap} className="table-scroll-mobile">
             <table style={styles.table}>
               <thead>
                 <tr>

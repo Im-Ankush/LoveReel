@@ -68,7 +68,7 @@ const AdminSettings = () => {
 }
 
 const styles = {
-  container: { maxWidth: '520px' },
+  container: { maxWidth: '520px', width: '100%', boxSizing: 'border-box' },
   title: {
     fontSize: '28px',
     fontWeight: 700,

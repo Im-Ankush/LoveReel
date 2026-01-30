@@ -46,7 +46,7 @@ const AdminPages = () => {
         </button>
       </div>
 
-      <div style={styles.tableWrap}>
+      <div style={styles.tableWrap} className="table-scroll-mobile">
         <table style={styles.table}>
           <thead>
             <tr>
@@ -140,7 +140,7 @@ const AdminPages = () => {
 }
 
 const styles = {
-  container: { maxWidth: '900px' },
+  container: { maxWidth: '900px', width: '100%', boxSizing: 'border-box' },
   title: {
     fontSize: '28px',
     fontWeight: 700,

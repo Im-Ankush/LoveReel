@@ -51,7 +51,7 @@ const AdminDashboard = () => {
 }
 
 const styles = {
-  container: { maxWidth: '800px' },
+  container: { maxWidth: '800px', width: '100%', boxSizing: 'border-box' },
   title: {
     fontSize: '28px',
     fontWeight: 700,

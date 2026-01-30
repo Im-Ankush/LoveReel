@@ -17,11 +17,13 @@ import { ALL_CATEGORIES } from '../utils/siteConfig.js'
 import LoveLayout from '../layouts/LoveLayout.jsx'
 import EducationLayout from '../layouts/EducationLayout.jsx'
 import DashboardLayout from '../layouts/DashboardLayout.jsx'
+import { useMediaQuery } from '../hooks/useMediaQuery.js'
 
 const PARENT_EMOJI = { [PARENT_IDS.LOVE]: '💕', [PARENT_IDS.EDUCATION]: '📚' }
 
 const Home = () => {
   const userRole = typeof window !== 'undefined' ? localStorage.getItem('userRole') : 'full'
+  const isMobile = useMediaQuery()
   const [config, setConfig] = useState(getDashboardConfig)
   const [showAdminPanel, setShowAdminPanel] = useState(false)
   const [expandedParents, setExpandedParents] = useState({ [PARENT_IDS.LOVE]: true, [PARENT_IDS.EDUCATION]: true })
@@ -89,8 +91,8 @@ const Home = () => {
   }
 
   const dashboardBody = (
-    <motion.div style={styles.content} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-      <div style={styles.titleRow}>
+    <motion.div style={{ ...styles.content, ...(isMobile ? styles.contentMobile : {}) }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <div style={{ ...styles.titleRow, ...(isMobile ? styles.titleRowMobile : {}) }}>
         <h1 style={styles.title}>
           <span style={{ color: '#ff4d6d' }}>
             {userRole === 'education' ? 'Education' : userRole === 'love' ? 'Love' : 'Dashboard'}
@@ -344,16 +346,24 @@ const styles = {
     paddingBottom: '48px',
     cursor: 'auto',
   },
+  containerMobile: {
+    padding: '16px',
+    paddingTop: '72px',
+    paddingBottom: '32px',
+  },
+  content: {
+    maxWidth: '720px',
+    margin: '0 auto',
+  },
+  contentMobile: {
+    maxWidth: '100%',
+  },
   containerAdmin: {
     height: 'calc(100vh - 56px)',
     minHeight: 0,
     width: '100%',
     overflow: 'hidden',
     cursor: 'auto',
-  },
-  content: {
-    maxWidth: '720px',
-    margin: '0 auto',
   },
   // Admin-only dashboard styles
   adminContent: {
@@ -552,6 +562,10 @@ const styles = {
     justifyContent: 'center',
     gap: '16px',
     marginBottom: '32px',
+  },
+  titleRowMobile: {
+    gap: '12px',
+    marginBottom: '24px',
   },
   title: {
     fontSize: 'clamp(26px, 6vw, 36px)',
