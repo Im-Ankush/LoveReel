@@ -4,7 +4,7 @@ import ReelPlayer from '../../../components/ReelPlayer.jsx'
 const TightHug = () => {
   const backgroundConfig = {
     type: 'image',
-    url: 'https://images.unsplash.com/photo-1484100356142-db6ab6244067?w=1080&q=80',
+    url: 'https://images.unsplash.com/photo-1641617254442-30e517accac0?w=1080&q=80',
   }
   
   const slides = [

@@ -13,6 +13,7 @@ export const PARENT_LABELS = {
 }
 
 export const LOVE_CHILD_IDS = [
+  'Valentine Week',
   'Main Vibes',
   'Romantic Moments',
   'Emoji Vibes',
@@ -72,6 +73,8 @@ export function setDashboardConfig(config) {
 /**
  * Apply config to categories: group by parent, filter/order children.
  * Returns { love: categories[], education: categories[] } for visible parents in order.
+ * Any category in LOVE_CHILD_IDS / EDUCATION_CHILD_IDS that exists in allCategories
+ * but is missing from saved order is appended so new sections (e.g. Valentine Week) show.
  */
 export function applyDashboardConfig(allCategories, config) {
   const byTitle = Object.fromEntries(allCategories.map((c) => [c.title, c]))
@@ -83,8 +86,15 @@ export function applyDashboardConfig(allCategories, config) {
   for (const id of loveOrder) {
     if (byTitle[id]) result.love.push(byTitle[id])
   }
+  for (const id of LOVE_CHILD_IDS) {
+    if (byTitle[id] && !result.love.some((c) => c.title === id)) result.love.push(byTitle[id])
+  }
+
   for (const id of educationOrder) {
     if (byTitle[id]) result.education.push(byTitle[id])
+  }
+  for (const id of EDUCATION_CHILD_IDS) {
+    if (byTitle[id] && !result.education.some((c) => c.title === id)) result.education.push(byTitle[id])
   }
 
   return result

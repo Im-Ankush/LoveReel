@@ -4,7 +4,7 @@ import ReelPlayer from '../../../components/ReelPlayer.jsx'
 const MissYou = () => {
   const backgroundConfig = {
     type: 'image',
-    url: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1080&q=80',
+    url: 'https://images.unsplash.com/photo-1473073957860-e6eb51b91b47?w=1080&q=80',
   }
   
   const slides = [

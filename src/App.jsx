@@ -57,6 +57,15 @@ import AnswerHonestly from './pages/love/interactive-stories/AnswerHonestly.jsx'
 import UsFeeling from './pages/love/interactive-stories/UsFeeling.jsx'
 import SendThisToMe from './pages/love/interactive-stories/SendThisToMe.jsx'
 
+// Valentine Week (reel-optimized)
+import RoseDay from './pages/love/valentine-week/RoseDay.jsx'
+import ProposeDay from './pages/love/valentine-week/ProposeDay.jsx'
+import ChocolateDay from './pages/love/valentine-week/ChocolateDay.jsx'
+import TeddyDay from './pages/love/valentine-week/TeddyDay.jsx'
+import PromiseDay from './pages/love/valentine-week/PromiseDay.jsx'
+import HugDay from './pages/love/valentine-week/HugDay.jsx'
+import KissDay from './pages/love/valentine-week/KissDay.jsx'
+
 // Education
 import VocabularyStory from './pages/education/VocabularyStory.jsx'
 
@@ -237,6 +246,15 @@ function App() {
           <Route path="/answer-honestly" element={<AnswerHonestly />} />
           <Route path="/us-feeling" element={<UsFeeling />} />
           <Route path="/send-this-to-me" element={<SendThisToMe />} />
+
+          {/* Valentine Week */}
+          <Route path="/rose-day" element={<RoseDay />} />
+          <Route path="/propose-day" element={<ProposeDay />} />
+          <Route path="/chocolate-day" element={<ChocolateDay />} />
+          <Route path="/teddy-day" element={<TeddyDay />} />
+          <Route path="/promise-day" element={<PromiseDay />} />
+          <Route path="/hug-day" element={<HugDay />} />
+          <Route path="/kiss-day" element={<KissDay />} />
 
           {/* Education */}
           <Route path="/education/vocabulary-story" element={<VocabularyStory />} />

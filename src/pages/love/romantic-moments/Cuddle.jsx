@@ -4,7 +4,7 @@ import ReelPlayer from '../../../components/ReelPlayer.jsx'
 const Cuddle = () => {
   const backgroundConfig = {
     type: 'image',
-    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1080&q=80',
+    url: 'https://images.unsplash.com/photo-1504194569341-48a2e831a3a7?w=1080&q=80',
   }
   
   const slides = [
