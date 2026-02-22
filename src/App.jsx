@@ -68,6 +68,12 @@ import KissDay from './pages/love/valentine-week/KissDay.jsx'
 
 // Education
 import VocabularyStory from './pages/education/VocabularyStory.jsx'
+import Vocabulary1 from './pages/education/Vocabulary1.jsx'
+import Vocabulary2 from './pages/education/Vocabulary2.jsx'
+import Vocabulary3 from './pages/education/Vocabulary3.jsx'
+import Vocabulary4 from './pages/education/Vocabulary4.jsx'
+import Vocabulary5 from './pages/education/Vocabulary5.jsx'
+import Vocabulary6 from './pages/education/Vocabulary6.jsx'
 
 // Admin (full access only)
 import AdminLayout from './pages/admin/AdminLayout.jsx'
@@ -258,6 +264,12 @@ function App() {
 
           {/* Education */}
           <Route path="/education/vocabulary-story" element={<VocabularyStory />} />
+          <Route path="/education/vocabulary-1" element={<Vocabulary1 />} />
+          <Route path="/education/vocabulary-2" element={<Vocabulary2 />} />
+          <Route path="/education/vocabulary-3" element={<Vocabulary3 />} />
+          <Route path="/education/vocabulary-4" element={<Vocabulary4 />} />
+          <Route path="/education/vocabulary-5" element={<Vocabulary5 />} />
+          <Route path="/education/vocabulary-6" element={<Vocabulary6 />} />
         </Routes>
       </RoleRouteGuard>
     </Router>
